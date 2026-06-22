@@ -10,13 +10,13 @@ app = FastAPI()
 API_KEY = "TWNsZVMzZGJkM2JLV1lRU2ZsdHRYNVlCOGZzdUJsVzg"
 DOMAIN = "pbx25683.onpbx.ru"
 OPERATOR_EXTENSION = "100"  # Sizning ichki SIP raqamingiz
-TEST_MOBILE_NUMBER = "+998975960976"  # Sizning mobil raqamingiz (Nodir aka)
+TEST_MOBILE_NUMBER = "+998975960976"  # Sizning shaxsiy mobil raqamingiz (Nodir aka / Asilbek)
 # ==========================================================
 
 # onlinePBX orqali qo'ng'iroqni boshlash funksiyasi
 def trigger_telephony_call(customer_phone):
-    # onlinePBX rasmiy barqaror V1 API manzili
-    url = "https://api.onlinepbx.ru/v1/callback/originate.json"
+    # onlinePBX rasmiy barqaror V1 Callback API manzili (yangilangan)
+    url = "https://api.onlinepbx.ru/v1/callback/"
     
     payload = {
         "auth_key": API_KEY,
