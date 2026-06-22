@@ -10,7 +10,7 @@ app = FastAPI()
 API_KEY = "TWNsZVMzZGJkM2JLV1lRU2ZsdHRYNVlCOGZzdUJsVzg"
 DOMAIN = "pbx25683.onpbx.ru"
 OPERATOR_EXTENSION = "100"  # Sizning ichki SIP raqamingiz
-TEST_MOBILE_NUMBER = "+998998118889"  # Sizning mobil raqamingiz (Nodir aka)
+TEST_MOBILE_NUMBER = "+998975960976"  # Sizning mobil raqamingiz (Nodir aka)
 # ==========================================================
 
 # onlinePBX orqali qo'ng'iroqni boshlash funksiyasi
