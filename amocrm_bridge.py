@@ -15,8 +15,8 @@ TEST_MOBILE_NUMBER = "+998975960976"  # Sizning shaxsiy mobil raqamingiz (Nodir 
 
 # onlinePBX orqali qo'ng'iroqni boshlash funksiyasi
 def trigger_telephony_call(customer_phone):
-    # onlinePBX rasmiy barqaror V1 Callback API manzili (yangilangan)
-    url = "https://api.onlinepbx.ru/v1/callback/"
+    # onlinePBX rasmiy barqaror V1 Callback API manzili (oxiridagi slesh olib tashlandi!)
+    url = "https://api.onlinepbx.ru/v1/callback"
     
     payload = {
         "auth_key": API_KEY,
