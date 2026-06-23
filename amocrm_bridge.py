@@ -7,86 +7,86 @@ from datetime import datetime
 app = FastAPI()
 
 # ================= TELEFONIYA SOZLAMALARI =================
-API_KEY = "TWNsZVMzZGJkM2JLV1lRU2ZsdHRYNVlCOGZzdUJsVzg"
+# YANGI API KALIT O'RNATILDI
+API_KEY = "RHRLb1c3dlpCZENiR2VnM2FXZFVQR0dsOUV6MGtjeTU"
 DOMAIN = "pbx25683.onpbx.ru"
-OPERATOR_EXTENSION = "100"  # Sizning SIP telefoningiz (MicroSIP/Apparat)
-TEST_MOBILE_NUMBER = "998975960976" # + belgisiz yozildi
+OPERATOR_EXTENSION = "100" 
+TEST_MOBILE_NUMBER = "+998975960976" 
 # ==========================================================
 
 def trigger_telephony_call(customer_phone):
     """
     onlinePBX orqali qo'ng'iroqni boshlash funksiyasi.
     """
-    # URL manzili (Sizning domeningiz orqali)
+    # To'g'ri API manzili
     url = f"https://{DOMAIN}/api/v1/user/callback.json"
-    
-    # Raqamni faqat raqamlardan iborat holatga keltiramiz (+ belgisini olib tashlaydi)
-    clean_phone = "".join(filter(str.isdigit, customer_phone))
     
     payload = {
         "auth_key": API_KEY,
         "from": OPERATOR_EXTENSION,
-        "to": clean_phone
+        "to": customer_phone
     }
     
     headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "AmoCRM-Bot-v2"
+        "User-Agent": "AmoCRM-Bot-Integrator/1.0",
+        "Accept": "application/json"
     }
     
     try:
-        print(f"\n[SISTEMA] Qo'ng'iroq buyrug'i yuborilmoqda: {OPERATOR_EXTENSION} -> {clean_phone}")
+        print(f"\n[TELEFONIYA] So'rov yuborilmoqda: {OPERATOR_EXTENSION} -> {customer_phone}")
         
-        # onlinePBX-ga so'rov yuboramiz
+        # Ma'lumotlarni yuborish
         response = requests.post(url, data=payload, headers=headers, timeout=15)
         
-        print(f"[SISTEMA] HTTP Status: {response.status_code}")
+        print(f"[TELEFONIYA] Status kodi: {response.status_code}")
+        print(f"[TELEFONIYA] Server javobi: {response.text}")
         
-        # onlinePBX-dan kelgan haqiqiy javobni tahlil qilamiz
-        try:
-            result = response.json()
-            print(f"[SISTEMA] onlinePBX javobi: {result}")
-            
-            if result.get("status") == "success":
-                print("✅ MUVAFFAQIYATLI: onlinePBX qo'ng'iroqni qabul qildi.")
-                return True
-            else:
-                print(f"❌ XATOLIK: onlinePBX rad etdi. Sabab: {result.get('comment') or result.get('data')}")
-                return False
-        except:
-            print(f"[SISTEMA] JSON bo'lmagan javob keldi: {response.text}")
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"❌ onlinePBX xato qaytardi: {response.text}")
             return False
             
     except Exception as e:
-        print(f"❌ TEXNIK XATOLIK: {e}")
+        print(f"[TELEFONIYA] Texnik xatolik: {e}")
         return False
 
 @app.get("/")
 async def root():
-    return {"status": "online", "message": "Bot muvaffaqiyatli ishlayapti"}
+    return {"message": "AmoCRM-onlinePBX Bot ishlayapti!", "status": "active"}
 
 @app.post("/amocrm-webhook")
 async def receive_webhook(request: Request):
     print("\n" + "="*50)
-    print(f"🔔 WEBHOOK QABUL QILINDI: {datetime.now().strftime('%H:%M:%S')}")
+    print(f"🔔 {datetime.now().strftime('%H:%M:%S')} - AmoCRM'DAN SIGNAL KELDI!")
     
     try:
         form_data = await request.form()
         data = dict(form_data)
         
-        # AmoCRM'dan kelgan ma'lumotlarni logga chiqaramiz
-        print(f"Mijoz ma'lumotlari: {data}")
+        # Logda kelgan ma'lumotlarni ko'rsatish
+        print("Mijoz ma'lumotlari tahlili:")
+        for key, value in data.items():
+            print(f" - {key}: {value}")
         
-        # Qo'ng'iroqni boshlash
-        # TEST_MOBILE_NUMBER o'rniga data ichidan kelgan raqamni ham qo'yish mumkin
-        trigger_telephony_call(TEST_MOBILE_NUMBER)
+        # Qo'ng'iroqni amalga oshirish
+        # DIQQAT: Hozir test uchun faqat TEST_MOBILE_NUMBER ga tel qiladi.
+        # Agar mijozga tel qilmoqchi bo'lsangiz, raqamni 'data' ichidan olish kerak.
+        success = trigger_telephony_call(TEST_MOBILE_NUMBER)
         
+        if success:
+            print("✅ Qo'ng'iroq muvaffaqiyatli buyurtma qilindi!")
+        else:
+            print("❌ Qo'ng'iroq buyurtmasida xato.")
+
     except Exception as e:
-        print(f"❌ Webhook xatosi: {e}")
-        
+        print(f"❌ Webhookni ishlashda xatolik: {e}")
+    
     print("="*50 + "\n")
     return {"status": "success"}
 
 if __name__ == "__main__":
+    # Render uchun port
     port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Bot {port}-portda ishga tushmoqda...")
     uvicorn.run(app, host="0.0.0.0", port=port)
